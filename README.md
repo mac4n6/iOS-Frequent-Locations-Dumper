@@ -5,5 +5,8 @@ Usage:
 `python dump_freq_locs.py <StateModel#.archive>`
 —
 Dependencies:      
-* hexdump.py: https://pypi.python.org/pypi/hexdump    * ccl_bplist.py: https://github.com/jorik041/ccl-bplist 
+* hexdump.py: https://pypi.python.org/pypi/hexdump    * ccl_bplist.py: https://github.com/jorik041/ccl-bplist
+—
+sample_dump_freq_locs.txt - Sample script output
+ 
 
