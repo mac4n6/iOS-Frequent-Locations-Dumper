@@ -8,9 +8,9 @@ Dump the contents of the StateModel#.archive files located in /private/var/mobil
 * hexdump.py: https://pypi.python.org/pypi/hexdump    * ccl_bplist.py: https://github.com/jorik041/ccl-bplist
 
 ##Sample Output:
-*sample_dump_freq_locs.txt - Sample script output
+sample_dump_freq_locs.txt - Sample script output
 
 ##Related Information:
-*http://www.mac4n6.com/blog/2015/12/20/parsing-the-ios-frequent-locations
+http://www.mac4n6.com/blog/2015/12/20/parsing-the-ios-frequent-locations
  
 
