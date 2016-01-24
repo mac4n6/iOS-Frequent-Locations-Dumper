@@ -33,6 +33,8 @@ import sys
 import hexdump
 import argparse
 from argparse import RawTextHelpFormatter
+import csv
+import simplekml
 
 def getMetadata():
     print "METADATA:"
@@ -165,6 +167,20 @@ def getMetadata():
             print "\t\tUncertainty:\t\t" + str(lc_uncertainty)
         except:
             pass
+
+        if output_type == "c" or output_type == 'e':
+            #loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lc_timestamp), 'Timestamp','Last Cluster', lc_lat, lc_long, 'Null'])
+            loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lc_entry), 'Entry Timestamp','Last Cluster', lc_lat, lc_long, 'Null'])
+            loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lc_exit), 'Exit Timestamp','Last Cluster', lc_lat, lc_long, 'Null'])
+        
+        if output_type == "k" or output_type == 'e':
+            point = frequent_locations_folder.newpoint(name="Last_Cluster")
+            point.description = ("Entry Time: " + strftime("%m-%d-%Y %H:%M:%S", lc_entry) + "\nExit Time: " + strftime("%m-%d-%Y %H:%M:%S", lc_exit))
+            point.coords = [(lc_long, lc_lat)]
+            point.style.iconstyle.color = simplekml.Color.red
+            point.timespan.begin = strftime("%Y-%m-%dT%H:%M:%SZ", lc_entry)
+            point.timespan.end = strftime("%Y-%m-%dT%H:%M:%SZ", lc_exit)
+
     except:
         pass
 
@@ -283,6 +299,15 @@ def RTVisitMonitor():
         print "\tinsideAnLoi:\t\t\t\t" + str(insideAnLoi)
     except:
         pass
+    try:    
+        if entrySampleLat_deg != -1.0 or entrySampleLon_deg != -1.0: 
+            if output_type == "c" or output_type == 'e':
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lastProcessedSampleForAdaption_s), 'lastProcessedSampleForAdaption_s Timestamp','RTVisitMonitor', entrySampleLat_deg, entrySampleLon_deg, 'Null'])
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lastProcessedSample_s), 'lastProcessedSample_s Timestamp','RTVisitMonitor', entrySampleLat_deg, entrySampleLon_deg, 'Null'])
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", potentialEntry_s), 'potentialEntry_s Timestamp','RTVisitMonitor', entrySampleLat_deg, entrySampleLon_deg, 'Null'])
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", potentialExit_s), 'potentialExit_s Timestamp','RTVisitMonitor', entrySampleLat_deg, entrySampleLon_deg, 'Null'])
+    except:
+        pass
 
     #LastVisit
     print "\n\tLast Visit Information [lastVisit]:"
@@ -338,6 +363,20 @@ def RTVisitMonitor():
             print "\t\tUncertainty:\t\t" + str(lv_uncertainty)
         except:
             pass
+
+            if output_type == "c" or output_type == 'e':
+                #loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lv_timestamp), 'Timestamp','Last Visit', lv_lat, lv_long, 'Null'])
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lv_entry), 'Entry Timestamp','Last Visit', lv_lat, lv_long, 'Null'])
+                loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lv_exit), 'Exit Timestamp','Last Visit', lv_lat, lv_long, 'Null'])
+
+        if output_type == "k" or output_type == 'e':
+            point = frequent_locations_folder.newpoint(name="Last_Visit")
+            point.description = ("Entry Time: " + strftime("%m-%d-%Y %H:%M:%S", lv_entry) + "\nExit Time: " + strftime("%m-%d-%Y %H:%M:%S", lv_exit))
+            point.coords = [(lv_long, lv_lat)]
+            point.style.iconstyle.color = simplekml.Color.red
+            point.timespan.begin = strftime("%Y-%m-%dT%H:%M:%SZ", lv_entry)
+            point.timespan.end = strftime("%Y-%m-%dT%H:%M:%SZ", lv_exit)
+
     except:
         print "\t\t<<No Last Visit Data Populated>>"
 
@@ -403,12 +442,14 @@ def getLocations():
         #Location Details
         print "\nLocation Data:"
         try:
-            print "\tLatitude:\t\t" + str(item['stateDepiction']['clusterState']['location']["Latitude_deg"])
+            location_lat = str(item['stateDepiction']['clusterState']['location']["Latitude_deg"])
+            print "\tLatitude:\t\t" + location_lat
         except:
             print "\tLatitude:\t\t<<Not Populated>>"
 
         try:
-            print "\tLongitude:\t\t" + str(item['stateDepiction']['clusterState']['location']["Longitude_deg"])
+            location_long = str(item['stateDepiction']['clusterState']['location']["Longitude_deg"])
+            print "\tLongitude:\t\t" + location_long
         except:
             print "\tLongitude:\t\t<<Not Populated>>"
 
@@ -430,6 +471,11 @@ def getLocations():
                 print "\tUpdate Timestamp:\t" + strftime("%m-%d-%Y %H:%M:%S", loc_timestamp)
         except:
             print "\tUpdate Timestamp:\t<<Not Populated>>"
+
+        #If you really want the Updated Timestamps, uncomment below:
+        #if output_type == "c" or output_type == 'e':
+            #loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", lastUpdate_timestamp), 'Last Update Timestamp','Location ' + str(index + 1) , location_lat, location_long, 'Null'])
+            #loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", loc_timestamp), 'Update Timestamp','Location ' + str(index + 1) , location_lat, location_long, 'Null'])
 
         #Location Visits
         print "\nVisits (Entry/Exits):"
@@ -456,6 +502,19 @@ def getLocations():
                         print "\tExit Timestamp:\t\t" + strftime("%m-%d-%Y %H:%M:%S", exit_timestamp)
                 except:
                     print "\tExit Timestamp:\t\t<<Not Populated>>"
+
+                if output_type == "c" or output_type == 'e':
+                    loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", entry_timestamp), 'Entry Timestamp','Location ' + str(index + 1) , location_lat, location_long, 'Visit ' + str(index2 + 1)])
+                    loccsv.writerow([strftime("%m-%d-%Y %H:%M:%S", exit_timestamp), 'Exit Timestamp','Location ' + str(index + 1) , location_lat, location_long, 'Visit ' + str(index2 + 1)])
+
+                if output_type == "k" or output_type == 'e':
+                    point = frequent_locations_folder.newpoint(name="Loc " +str(index + 1) +  " - Visit " + str(index2 + 1))
+                    point.description = ("\nEntry Time: " + strftime("%m-%d-%Y %H:%M:%S", entry_timestamp) + "\nExit Time: " + strftime("%m-%d-%Y %H:%M:%S", exit_timestamp))
+                    point.coords = [(location_long, location_lat)]
+                    point.style.iconstyle.color = simplekml.Color.red
+                    point.timespan.begin = strftime("%Y-%m-%dT%H:%M:%SZ", entry_timestamp)
+                    point.timespan.end = strftime("%Y-%m-%dT%H:%M:%SZ", exit_timestamp)
+
         except:
             print "\t<<Visits Data Not Populated>>"
 
@@ -529,8 +588,8 @@ if __name__ == "__main__":
         description='\
     Parse the iOS "Frequent Locations" StateModel#.archive files. \
     \n\tiOS File Location: /private/var/mobile/Library/Caches/com.apple.routined/\
-    \n\tVersion: 1.0\
-    \n\tUpdated: 12/20/2015\
+    \n\tVersion: 1.1\
+    \n\tUpdated: 01/24/2015\
     \n\tAuthor: Sarah Edwards | @iamevltwin | mac4n6.com | oompa@csh.rit.edu\
     \n\
     \n\tDependencies:\
@@ -538,8 +597,12 @@ if __name__ == "__main__":
     \n\t\tccl_bplist.py: https://github.com/jorik041/ccl-bplist'
         , prog='dump_freq_locs.py'
         , formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-output', choices=['k','c','e'], action="store", help="k=KML, c=CSV, e=EVERTHING")
     parser.add_argument('State_Model_Plist_File')
     args = parser.parse_args()
+
+    global output_type
+    output_type = None
 
     statemodelfile = args.State_Model_Plist_File
 
@@ -549,7 +612,26 @@ if __name__ == "__main__":
     objects = plist_objects["root"]["stateModelLut"]['NS.objects']
     metadata_objects = plist["$top"]
     meta_uids = plist_objects["root"]
-    getMetadata()
-    RTVisitMonitor()
-    getLocations()
+
+    if args.output == 'c' or args.output == 'e':
+        output_type = 'c'
+        with open('dump_freq_locs_output.csv', 'wb') as csvfile:
+            loccsv = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            loccsv.writerow(['Timestamp', 'Timestamp Type','Data Type', 'Latitude', 'Longitude', 'Other Data'])
+
+            getMetadata()
+            RTVisitMonitor()
+            getLocations()
+
+    if args.output == 'k' or args.output =='e':
+        output_type = 'k'
+        kml = simplekml.Kml()
+        global frequent_locations_folder
+        frequent_locations_folder = kml.newfolder(name="Frequent Locations")
+
+        getMetadata()
+        RTVisitMonitor()
+        getLocations()
+
+        kml.save("dump_freq_locs_output.kml")
 
