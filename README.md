@@ -11,7 +11,7 @@ Dump the contents of the StateModel#.archive files located in /private/var/mobil
 
 ##Dependencies:      
 * hexdump.py: https://pypi.python.org/pypi/hexdump    
-* ccl_bplist.py: https://github.com/jorik041/ccl-bplist
+* ccl_bplist.py: https://github.com/cclgroupltd/ccl-bplist
 
 ##Sample Output:
 sample_dump_freq_locs.txt - Sample script output
